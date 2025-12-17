@@ -1,54 +1,87 @@
-using CodeChallenge.Api.Models;
-using CodeChallenge.Api.Repositories;
+using CodeChallenge.Models;
+using CodeChallenge.Repositories;
+//using CodeChallenge.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CodeChallenge.Api.Controllers;
-
-[ApiController]
-[Route("api/v1/organizations/{organizationId}/messages")]
-public class MessagesController : ControllerBase
+namespace CodeChallenge.Api.Controllers
 {
-    private readonly IMessageRepository _repository;
-    private readonly ILogger<MessagesController> _logger;
-
-    public MessagesController(IMessageRepository repository, ILogger<MessagesController> logger)
+    [ApiController]
+    [Route("api/v1/organizations/{organizationId}/messages")]
+    public class MessagesController : ControllerBase
     {
-        _repository = repository;
-        _logger = logger;
-    }
+        private readonly IMessageRepository _messageRepository;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Message>>> GetAll(Guid organizationId)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+        public MessagesController(IMessageRepository messageRepository)
+        {
+            _messageRepository = messageRepository;
+        }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Message>> GetById(Guid organizationId, Guid id)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+        // GET: /api/v1/organizations/{organizationId}/messages
+        [HttpGet]
+        public async Task<IActionResult> GetMessages(Guid organizationId)
+        {
+            var messages = await _messageRepository.GetAllByOrganizationAsync(organizationId);
+            return Ok(messages);
+        }
 
-    [HttpPost]
-    public async Task<ActionResult<Message>> Create(Guid organizationId, [FromBody] CreateMessageRequest request)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+        // GET: /api/v1/organizations/{organizationId}/messages/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMessageById(Guid organizationId, Guid id)
+        {
+            var message = await _messageRepository.GetByIdAsync(organizationId, id);
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult> Update(Guid organizationId, Guid id, [FromBody] UpdateMessageRequest request)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+            if (message == null)
+                return NotFound();
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid organizationId, Guid id)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
+            return Ok(message);
+        }
+
+        // POST: /api/v1/organizations/{organizationId}/messages
+        [HttpPost]
+        public async Task<IActionResult> CreateMessage(
+            Guid organizationId,
+            [FromBody] Message message)
+        {
+            message.OrganizationId = organizationId;
+
+            var createdMessage = await _messageRepository.CreateAsync(message);
+
+            return CreatedAtAction(
+                nameof(GetMessageById),
+                new { organizationId = organizationId, id = createdMessage.Id },
+                createdMessage);
+        }
+
+        // PUT: /api/v1/organizations/{organizationId}/messages/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateMessage(
+            Guid organizationId,
+            Guid id,
+            [FromBody] Message message)
+        {
+            if (id != message.Id)
+                return BadRequest("Message ID mismatch");
+
+            message.OrganizationId = organizationId;
+
+            var updated = await _messageRepository.UpdateAsync(message);
+
+            if (updated == null)
+                return NotFound();
+
+            return Ok(message);
+        }
+
+        // DELETE: /api/v1/organizations/{organizationId}/messages/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMessage(Guid organizationId, Guid id)
+        {
+            var deleted = await _messageRepository.DeleteAsync(organizationId, id);
+
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
+        }
     }
 }

@@ -1,4 +1,5 @@
-using CodeChallenge.Api.Models;
+using CodeChallenge.Models;
+using CodeChallenge.Repositories;
 
 namespace CodeChallenge.Api.Repositories;
 
