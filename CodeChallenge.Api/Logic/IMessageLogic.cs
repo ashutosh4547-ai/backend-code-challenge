@@ -1,12 +1,18 @@
-using CodeChallenge.Api.Models;
+using CodeChallenge.Api.Logic.Results;
+using CodeChallenge.Models;
 
-namespace CodeChallenge.Api.Logic;
-
-public interface IMessageLogic
+namespace CodeChallenge.Api.Logic
 {
-    Task<Result> CreateMessageAsync(Guid organizationId, CreateMessageRequest request);
-    Task<Result> UpdateMessageAsync(Guid organizationId, Guid id, UpdateMessageRequest request);
-    Task<Result> DeleteMessageAsync(Guid organizationId, Guid id);
-    Task<Message?> GetMessageAsync(Guid organizationId, Guid id);
-    Task<IEnumerable<Message>> GetAllMessagesAsync(Guid organizationId);
+    public interface IMessageLogic
+    {
+        Task<LogicResult<IEnumerable<Message>>> GetAllMessagesAsync(Guid organizationId);
+
+        Task<LogicResult<Message>> GetMessageAsync(Guid organizationId, Guid id);
+
+        Task<LogicResult<Message>> CreateMessageAsync(Guid organizationId, Message message);
+
+        Task<LogicResult<Message>> UpdateMessageAsync(Guid organizationId, Message message);
+
+        Task<LogicResult<bool>> DeleteMessageAsync(Guid organizationId, Guid id);
+    }
 }

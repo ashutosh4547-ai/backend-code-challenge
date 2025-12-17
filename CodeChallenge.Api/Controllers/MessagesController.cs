@@ -1,54 +1,54 @@
-using CodeChallenge.Api.Models;
-using CodeChallenge.Api.Repositories;
+using CodeChallenge.Api.Logic;
+using CodeChallenge.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CodeChallenge.Api.Controllers;
-
-[ApiController]
-[Route("api/v1/organizations/{organizationId}/messages")]
-public class MessagesController : ControllerBase
+namespace CodeChallenge.Api.Controllers
 {
-    private readonly IMessageRepository _repository;
-    private readonly ILogger<MessagesController> _logger;
-
-    public MessagesController(IMessageRepository repository, ILogger<MessagesController> logger)
+    [ApiController]
+    [Route("api/v1/organizations/{organizationId}/messages")]
+    public class MessagesController : ControllerBase
     {
-        _repository = repository;
-        _logger = logger;
-    }
+        private readonly IMessageLogic _logic;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Message>>> GetAll(Guid organizationId)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+        public MessagesController(IMessageLogic logic)
+        {
+            _logic = logic;
+        }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Message>> GetById(Guid organizationId, Guid id)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+        [HttpGet]
+        public async Task<IActionResult> GetAll(Guid organizationId)
+        {
+            var result = await _logic.GetAllMessagesAsync(organizationId);
+            return Ok(result.Value);
+        }
 
-    [HttpPost]
-    public async Task<ActionResult<Message>> Create(Guid organizationId, [FromBody] CreateMessageRequest request)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid organizationId, Guid id)
+        {
+            var result = await _logic.GetMessageAsync(organizationId, id);
+            return result.ToActionResult();
+        }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult> Update(Guid organizationId, Guid id, [FromBody] UpdateMessageRequest request)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
-    }
+        [HttpPost]
+        public async Task<IActionResult> Create(Guid organizationId, [FromBody] Message message)
+        {
+            var result = await _logic.CreateMessageAsync(organizationId, message);
+            return result.ToActionResult();
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid organizationId, Guid id)
-    {
-        // TODO: Implement
-        throw new NotImplementedException();
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid organizationId, Guid id, [FromBody] Message message)
+        {
+            message.Id = id;
+            var result = await _logic.UpdateMessageAsync(organizationId, message);
+            return result.ToActionResult();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid organizationId, Guid id)
+        {
+            var result = await _logic.DeleteMessageAsync(organizationId, id);
+            return result.ToActionResult();
+        }
     }
 }
