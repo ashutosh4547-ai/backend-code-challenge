@@ -1,5 +1,4 @@
 using CodeChallenge.Api.Models;
-using CodeChallenge.Models;
 
 namespace CodeChallenge.Api.Logic;
 

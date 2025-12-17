@@ -1,5 +1,4 @@
 using CodeChallenge.Api.Repositories;
-using CodeChallenge.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

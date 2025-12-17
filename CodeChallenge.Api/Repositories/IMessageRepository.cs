@@ -1,6 +1,6 @@
-using CodeChallenge.Models;
+using CodeChallenge.Api.Models;
 
-namespace CodeChallenge.Repositories;
+namespace CodeChallenge.Api.Repositories;
 
 public interface IMessageRepository
 {

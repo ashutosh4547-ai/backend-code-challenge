@@ -1,6 +1,4 @@
-using System.Text.Json.Serialization;
-
-namespace CodeChallenge.Models;
+namespace CodeChallenge.Api.Models;
 
 public class Message
 {
